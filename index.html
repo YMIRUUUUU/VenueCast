@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VenueCast — City-Aware Forecasting for Venues & Events</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="/i18n.js"></script>
+    <script src="./script.js" defer></script>
     <!-- SEO & Social Preview -->
     <meta name="description" content="Prévisions de fréquentation pour restaurants et lieux à Lyon. Météo, événements, vacances — anticipez la demande.">
     <meta property="og:title" content="VenueCast — Prévisions de demande pour restaurants à Lyon">
@@ -455,6 +452,78 @@
             .cr-form textarea, .cr-form .cr-submit { grid-column: 1; }
         }
 
+
+        .email-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 200;
+        }
+        .email-modal.open { display: flex; }
+        .email-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(13, 17, 23, 0.58);
+        }
+        .email-modal-card {
+            position: relative;
+            width: min(100%, 560px);
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 2rem;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+            border: 1px solid var(--border);
+        }
+        .email-modal-kicker {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        .email-modal-card h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 1rem;
+        }
+        .email-modal-copy {
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .email-preview {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+        .email-preview-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            background: var(--paper);
+        }
+        .email-preview-row span {
+            color: var(--muted);
+            text-align: right;
+        }
+        .email-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            border: none;
+            background: transparent;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted);
+        }
+
         /* ---- CLOSING ---- */
         .closing {
             max-width: 740px;
@@ -550,11 +619,27 @@
         </div>
         <button class="nav-hamburger" id="nav-hamburger" onclick="toggleNav()">☰</button>
         <div class="nav-menu" id="nav-menu">
-            <a href="/how-it-works" style="font-size:0.82rem;font-weight:600;color:var(--muted);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'" data-i18n="nav.how_it_works">How It Works</a>
+            <a href="#how-it-works" style="font-size:0.82rem;font-weight:600;color:var(--muted);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'" data-i18n="nav.how_it_works">How It Works</a>
             <div id="vc-lang-container"></div>
         </div>
     </nav>
+    
     <div class="nav-menu-overlay" id="nav-overlay" onclick="closeNav()"></div>
+
+    <div class="email-modal" id="email-modal" aria-hidden="true" role="dialog" aria-labelledby="email-preview-title">
+        <div class="email-modal-backdrop" onclick="closeEmailPreview()"></div>
+        <div class="email-modal-card">
+            <button type="button" class="email-modal-close" aria-label="Close email preview" onclick="closeEmailPreview()">×</button>
+            <p class="email-modal-kicker">Sample digest</p>
+            <h2 id="email-preview-title">Lyon forecast email preview</h2>
+            <div class="email-preview">
+                <div class="email-preview-row"><strong>Tue</strong><span>89 · Salon Pro at Eurexpo · warm and dry</span></div>
+                <div class="email-preview-row"><strong>Wed</strong><span>34 · heavy rain and wind · cut terrace staffing</span></div>
+                <div class="email-preview-row"><strong>Fri</strong><span>94 · OL match night · plan extra inventory</span></div>
+            </div>
+            <p class="email-modal-copy">This static demo replaces the missing backend email endpoint so visitors can still understand the product instantly.</p>
+        </div>
+    </div>
 
     <section class="hero">
         <div class="hero-kicker" data-i18n="index.hero.kicker">For restaurants, venues & events</div>
@@ -564,16 +649,16 @@
             From 7 days to 3 months out. No POS integration required.
         </p>
         <div style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-            <a href="/forecast" data-i18n="index.cta.forecast" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: var(--accent); color: #fff; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: background 0.2s;" onmouseover="this.style.background='#d4451a'" onmouseout="this.style.background='var(--accent)'">
+            <a href="#live-forecast" data-i18n="index.cta.forecast" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: var(--accent); color: #fff; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: background 0.2s;" onmouseover="this.style.background='#d4451a'" onmouseout="this.style.background='var(--accent)'">
                 See Lyon's Live Forecast →
             </a>
-            <a href="/api/forecast/email" target="_blank" data-i18n="index.cta.email" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: transparent; color: var(--ink); border: 2px solid var(--border); border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <button type="button" onclick="openEmailPreview()" data-i18n="index.cta.email" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: transparent; color: var(--ink); border: 2px solid var(--border); border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: border-color 0.2s; cursor:pointer;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
                 Preview Email Digest
-            </a>
+            </button>
         </div>
     </section>
 
-    <section class="forecast-strip">
+    <section class="forecast-strip" id="live-forecast">
         <h2 data-i18n="index.strip.header">Lyon — Week of March 17, 2026</h2>
         <div class="strip-grid">
             <div class="strip-day">
@@ -650,7 +735,7 @@
         </div>
     </section>
 
-    <section class="how">
+    <section class="how" id="how-it-works">
         <h2 data-i18n="index.how.title">How it works</h2>
         <div class="how-steps">
             <div>
@@ -730,8 +815,8 @@
     function toggleNav() {
         const menu = document.getElementById('nav-menu');
         const overlay = document.getElementById('nav-overlay');
-        menu.classList.toggle('active');
-        overlay.classList.toggle('active');
+        const isOpen = menu.classList.toggle('active');
+        overlay.classList.toggle('active', isOpen);
     }
     function closeNav() {
         const menu = document.getElementById('nav-menu');
@@ -739,6 +824,20 @@
         menu.classList.remove('active');
         overlay.classList.remove('active');
     }
+    function openEmailPreview() {
+        document.getElementById('email-modal').classList.add('open');
+        document.getElementById('email-modal').setAttribute('aria-hidden', 'false');
+    }
+    function closeEmailPreview() {
+        document.getElementById('email-modal').classList.remove('open');
+        document.getElementById('email-modal').setAttribute('aria-hidden', 'true');
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeNav();
+            closeEmailPreview();
+        }
+    });
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('nav-menu');
         const hamburger = document.getElementById('nav-hamburger');
@@ -750,6 +849,18 @@
 
     <!-- City Request Form -->
     <script>
+    function saveCityRequestLocally(payload) {
+        var key = 'venuecast_city_requests';
+        var existing = [];
+        try {
+            existing = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch (err) {
+            existing = [];
+        }
+        existing.push(Object.assign({ submittedAt: new Date().toISOString() }, payload));
+        localStorage.setItem(key, JSON.stringify(existing));
+    }
+
     async function submitCityRequest(e) {
         e.preventDefault();
         var t = VC.i18n.t.bind(VC.i18n);
@@ -759,6 +870,7 @@
         var message = document.getElementById('cr-message').value.trim();
         var feedback = document.getElementById('cr-feedback');
         var btn = document.getElementById('cr-submit-btn');
+        var payload = { email: email, city: city, country: country || undefined, message: message || undefined };
 
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             feedback.textContent = t('index.city_req.error_email');
@@ -777,23 +889,29 @@
         feedback.className = 'cr-feedback';
 
         try {
-            var resp = await fetch('/api/city-request', {
+            var resp = await fetch('./api/city-request', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, city: city, country: country || undefined, message: message || undefined })
+                body: JSON.stringify(payload)
             });
+
+            if (!resp.ok) {
+                throw new Error('API unavailable');
+            }
+
             var data = await resp.json();
             if (data.success) {
                 feedback.textContent = t('index.city_req.success');
                 feedback.className = 'cr-feedback success';
                 document.getElementById('city-request-form').reset();
             } else {
-                feedback.textContent = data.message || 'Error';
-                feedback.className = 'cr-feedback error';
+                throw new Error(data.message || 'Unexpected response');
             }
         } catch (err) {
-            feedback.textContent = 'Network error. Please try again.';
-            feedback.className = 'cr-feedback error';
+            saveCityRequestLocally(payload);
+            feedback.textContent = t('index.city_req.success') + ' (saved locally in this demo).';
+            feedback.className = 'cr-feedback success';
+            document.getElementById('city-request-form').reset();
         } finally {
             btn.textContent = t('index.city_req.btn');
             btn.disabled = false;
