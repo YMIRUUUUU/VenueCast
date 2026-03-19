@@ -1,0 +1,9 @@
+{
+  "name": "venuecast",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-contained static VenueCast landing page server",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
